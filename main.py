@@ -1,6 +1,6 @@
 import sys
 
-print('Enigma Machine Simulator')
+print('Enigma Machine Simulator\n')
 
 bruteforced = False
 
@@ -18,12 +18,15 @@ rotorIndexes = [-1, -1, -1]
 
 reflector_b = [4, 13, 10, 16, 0, 20, 24, 22, 9, 8, 2, 14,
                15, 1, 11, 12, 3, 23, 25, 21, 5, 19, 7, 17, 6, 18]
+
 reflector_c = [5, 18, 14, 10, 0, 13, 20, 4, 17, 7, 12, 1,
                19, 8, 24, 2, 22, 11, 16, 15, 25, 23, 21, 6, 9, 3]
 
 messageInNumbers = []
 
 while not bruteforced:
+    rotorIndexes = [-1, -1, -1]
+    messageInNumbers = []
     encryptedMessage = []
 
     message = input(str('Enter a message to encrypt: '))
@@ -45,29 +48,58 @@ while not bruteforced:
     print(f'Message: {message}.\nNumbers: {messageInNumbers}.')
 
     for numberLetter in messageInNumbers:
-        numberLetter = numberLetter + rotor1[rotorIndexes[0]]
-        numberLetter = numberLetter + rotor2[rotorIndexes[1]]
-        numberLetter = numberLetter + rotor3[rotorIndexes[2]]
-
-        
-        # Convert number to letter and handle overflow
-        for i in range(0, len(alphabet)):
-            if numberLetter == i:
-                encryptedMessage.append(alphabet[i])
-            elif numberLetter > 25:
-                numberLetter = numberLetter - 26
-                if numberLetter == i:
-                    encryptedMessage.append(alphabet[i])
-
-        rotorIndexes[0] = rotorIndexes[0] + 1
-
         if rotor1[rotorIndexes[0]] > 100:
+            rotor1[rotorIndexes[0]] = rotor1[rotorIndexes[0]] - 100
             rotorIndexes[1] = rotorIndexes[1] + 1
         if rotor2[rotorIndexes[1]] > 100:
+            rotor2[rotorIndexes[1]] = rotor2[rotorIndexes[1]] - 100
             rotorIndexes[2] = rotorIndexes[2] + 1
         if rotorIndexes[0] == 25:
             rotorIndexes[0] = 0
         if rotorIndexes[1] == 25:
             rotorIndexes[1] = 0
+        
+        print(f'Rotor 1: {rotor1[rotorIndexes[0]]}, Rotor 2: {rotor2[rotorIndexes[1]]}, Rotor 3: {rotor3[rotorIndexes[2]]}')
+
+        numberLetter = numberLetter + rotor1[rotorIndexes[0]]
+
+        if numberLetter > 25:
+            numberLetter = numberLetter - 26
+
+        numberLetter = numberLetter + rotor2[rotorIndexes[1]]
+        
+        if numberLetter > 25:
+            numberLetter = numberLetter - 26
+        
+        numberLetter = numberLetter + rotor3[rotorIndexes[2]]
+        
+        if numberLetter > 25:
+            numberLetter = numberLetter - 26
+
+        print(f'Number before being affected by the reflector: {numberLetter}.')
+        numberLetter = reflector_b[numberLetter]
+        print(f'Number after being affected by the reflector: {numberLetter}.')
+
+        numberLetter = numberLetter + rotor3[rotorIndexes[2]]
+
+        if numberLetter > 25:
+            numberLetter = numberLetter - 26
+
+        numberLetter = numberLetter + rotor2[rotorIndexes[1]]
+
+        if numberLetter > 25:
+            numberLetter = numberLetter - 26
+
+        numberLetter = numberLetter + rotor1[rotorIndexes[0]]
+
+        if numberLetter > 25:
+            numberLetter = numberLetter - 26
+
+        # Convert number to letter.
+        for i in range(0, len(alphabet)):
+            if numberLetter == i:
+                encryptedMessage.append(alphabet[i])
+        
+        rotorIndexes[0] = rotorIndexes[0] + 1
          
     print(f'Encrypted message: {encryptedMessage}.')
